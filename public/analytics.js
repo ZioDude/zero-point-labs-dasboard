@@ -318,7 +318,7 @@
         return 'http://localhost:3002';
       }
       // Default to your production domain
-      return 'https://your-analytics-domain.vercel.app';
+      return 'https://zero-point-labs-dasboard.vercel.app';
     }
 
     /**
