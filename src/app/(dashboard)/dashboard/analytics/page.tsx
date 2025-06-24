@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { BarChart3, Users, MousePointer, FileText, TrendingUp } from 'lucide-react'
+import { BarChart3, Users, FileText, TrendingUp } from 'lucide-react'
 import { prisma } from '@/lib/db'
 
 export default async function AnalyticsPage() {
