@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "build:sdk": "webpack --config webpack.sdk.js",
     "dev:sdk": "webpack --config webpack.sdk.js --watch"
   },
