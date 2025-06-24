@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Settings, User, Key, Globe, Bell, Shield, Database, Copy } from 'lucide-react'
+import { User, Key, Globe, Bell, Shield, Database, Copy } from 'lucide-react'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
 

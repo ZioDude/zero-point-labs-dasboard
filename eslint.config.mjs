@@ -28,7 +28,8 @@ const eslintConfig = [
           "argsIgnorePattern": "^_",
           "varsIgnorePattern": "^_"
         }
-      ]
+      ],
+      "react/no-unescaped-entities": "off"
     }
   }
 ];

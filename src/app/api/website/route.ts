@@ -8,7 +8,7 @@ function generateApiKey(): string {
 }
 
 // GET - Fetch client's website configuration
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // For now, we're using the first client
     // In production, this would be based on authenticated user
