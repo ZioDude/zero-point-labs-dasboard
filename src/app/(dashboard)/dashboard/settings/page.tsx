@@ -82,7 +82,7 @@ export default async function SettingsPage() {
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Tracking Script</label>
                   <pre className="bg-gray-100 p-4 rounded-lg text-xs overflow-x-auto">
-{`<script src="${process.env.NEXT_PUBLIC_APP_URL || 'https://your-domain.vercel.app'}/analytics.js"></script>
+{`<script src="${process.env.NEXT_PUBLIC_APP_URL || 'https://zero-point-labs-dasboard.vercel.app'}/analytics.js"></script>
 <script>
   Analytics.init('${website.apiKey}');
 </script>`}
