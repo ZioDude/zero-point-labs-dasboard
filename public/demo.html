@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics SDK Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .event-log {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .nav {
+            background: #343a40;
+            padding: 10px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 8px 8px 0 0;
+        }
+        .nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .nav a:hover {
+            background: #495057;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="#home" onclick="navigateToSection('home')">Home</a>
+            <a href="#about" onclick="navigateToSection('about')">About</a>
+            <a href="#contact" onclick="navigateToSection('contact')">Contact</a>
+            <a href="#blog" onclick="navigateToSection('blog')">Blog</a>
+        </div>
+
+        <h1>Analytics SDK Demo</h1>
+        <p>This demo page shows how the Analytics SDK works in practice. Open your browser's developer console to see events being tracked.</p>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="pageViews">0</div>
+                <div>Page Views</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="clicks">0</div>
+                <div>Clicks Tracked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="formSubmissions">0</div>
+                <div>Form Submissions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="customEvents">0</div>
+                <div>Custom Events</div>
+            </div>
+        </div>
+
+        <h2>Test Interactions</h2>
+        
+        <div class="container">
+            <h3>Buttons (Click Tracking)</h3>
+            <button id="btn-primary" onclick="handleClick('Primary Button')">Primary Action</button>
+            <button id="btn-secondary" onclick="handleClick('Secondary Button')">Secondary Action</button>
+            <button onclick="Analytics.track('custom_event', { source: 'demo', action: 'custom_button_click' })">
+                Track Custom Event
+            </button>
+        </div>
+
+        <div class="container">
+            <h3>Contact Form (Form Tracking)</h3>
+            <form id="contact-form" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message:</label>
+                    <textarea id="message" name="message" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password (sensitive - won't be tracked):</label>
+                    <input type="password" id="password" name="password">
+                </div>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+
+        <div class="container">
+            <h3>User Identification</h3>
+            <button onclick="setDemoUser()">Set Demo User ID</button>
+            <button onclick="clearDemoUser()">Clear User ID</button>
+            <p>Current User ID: <span id="current-user">Not set</span></p>
+        </div>
+
+        <div class="container">
+            <h3>Page Navigation (Virtual Page Views)</h3>
+            <button onclick="simulatePageView('/page1')">Simulate Page 1 View</button>
+            <button onclick="simulatePageView('/page2')">Simulate Page 2 View</button>
+            <button onclick="simulatePageView('/products')">Simulate Products Page</button>
+        </div>
+
+        <div class="container">
+            <h3>Event Log</h3>
+            <div class="event-log" id="event-log">
+                Events will appear here...
+            </div>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+
+        <h2>Integration Instructions</h2>
+        <div class="container">
+            <p>To use this Analytics SDK on your website, add the following code to your HTML:</p>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;"><code>&lt;!-- Add this before closing &lt;/head&gt; tag --&gt;
+&lt;script src="https://your-domain.vercel.app/analytics.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  // Initialize with your API key
+  Analytics.init('ak_demo_main_website_123456789');
+  
+  // Or with full configuration
+  Analytics.init({
+    apiKey: 'your-api-key-here',
+    debug: true,
+    trackPageViews: true,
+    trackClicks: true,
+    trackForms: true,
+    trackPerformance: true
+  });
+&lt;/script&gt;</code></pre>
+
+            <h4>Manual Event Tracking</h4>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 4px; overflow-x: auto;"><code>// Track custom events
+Analytics.track('button_click', { 
+  button_name: 'Get Started',
+  section: 'hero' 
+});
+
+// Track page views manually
+Analytics.trackPageView('/custom-page');
+
+// Set user identification
+Analytics.setUserId('user123');</code></pre>
+        </div>
+    </div>
+
+    <!-- Load the Analytics SDK -->
+    <script src="/analytics.js"></script>
+    
+    <script>
+        // Initialize Analytics SDK with demo API key
+        Analytics.init({
+            apiKey: 'ak_demo_main_website_123456789',
+            debug: true, // Enable debug mode to see events in console
+            endpoint: 'http://localhost:3002' // Point to our local development server
+        });
+
+        // Demo page functionality
+        let pageViewCount = 0;
+        let clickCount = 0;
+        let formSubmissionCount = 0;
+        let customEventCount = 0;
+
+        // Log events to the page
+        function logEvent(eventType, data) {
+            const log = document.getElementById('event-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.innerHTML = `<strong>[${timestamp}]</strong> ${eventType}: ${JSON.stringify(data, null, 2)}`;
+            entry.style.marginBottom = '10px';
+            entry.style.padding = '5px';
+            entry.style.backgroundColor = '#e9ecef';
+            entry.style.borderRadius = '3px';
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+
+            // Update counters
+            if (eventType === 'pageview') {
+                pageViewCount++;
+                document.getElementById('pageViews').textContent = pageViewCount;
+            } else if (eventType === 'click') {
+                clickCount++;
+                document.getElementById('clicks').textContent = clickCount;
+            } else if (eventType === 'form_submission') {
+                formSubmissionCount++;
+                document.getElementById('formSubmissions').textContent = formSubmissionCount;
+            } else if (eventType.includes('custom')) {
+                customEventCount++;
+                document.getElementById('customEvents').textContent = customEventCount;
+            }
+        }
+
+        // Override Analytics.track to also log to the page
+        const originalTrack = Analytics.track.bind(Analytics);
+        Analytics.track = function(eventType, metadata) {
+            logEvent(eventType, metadata);
+            return originalTrack(eventType, metadata);
+        };
+
+        function handleClick(buttonName) {
+            Analytics.track('demo_button_click', {
+                button_name: buttonName,
+                timestamp: Date.now()
+            });
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            // Analytics.trackFormSubmission is called automatically
+            logEvent('form_submission', { form_id: 'contact-form' });
+            alert('Form submitted! Check the analytics dashboard.');
+        }
+
+        function setDemoUser() {
+            Analytics.setUserId('demo_user_' + Date.now());
+            document.getElementById('current-user').textContent = 'demo_user_' + Date.now();
+        }
+
+        function clearDemoUser() {
+            Analytics.clearUserId();
+            document.getElementById('current-user').textContent = 'Not set';
+        }
+
+        function simulatePageView(path) {
+            Analytics.trackPageView(window.location.origin + path);
+        }
+
+        function navigateToSection(section) {
+            Analytics.track('navigation', {
+                section: section,
+                from: window.location.pathname
+            });
+        }
+
+        function clearLog() {
+            document.getElementById('event-log').innerHTML = 'Events will appear here...';
+            pageViewCount = 0;
+            clickCount = 0;
+            formSubmissionCount = 0;
+            customEventCount = 0;
+            document.getElementById('pageViews').textContent = '0';
+            document.getElementById('clicks').textContent = '0';
+            document.getElementById('formSubmissions').textContent = '0';
+            document.getElementById('customEvents').textContent = '0';
+        }
+
+        // Initialize counters
+        pageViewCount = 1; // Count initial page load
+        document.getElementById('pageViews').textContent = pageViewCount;
+    </script>
+</body>
+</html> 

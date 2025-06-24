@@ -1,0 +1,123 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Clients (Organizations)
+model Client {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String   @db.VarChar(255)
+  email     String   @unique @db.VarChar(255)
+  plan      String   @default("free") @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  users    ClientUser[]
+  website  Website?
+
+  @@map("clients")
+}
+
+// Client Users (Team members)
+model ClientUser {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clientId String @map("client_id") @db.Uuid
+  email    String @db.VarChar(255)
+  role     String @default("member") @db.VarChar(50) // owner, admin, member
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("client_users")
+}
+
+// Website (One per client)
+model Website {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clientId  String   @unique @map("client_id") @db.Uuid
+  name      String   @db.VarChar(255)
+  domain    String   @db.VarChar(255)
+  apiKey    String   @unique @map("api_key") @db.VarChar(255)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  // Relations
+  client              Client               @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  analyticsEvents     AnalyticsEvent[]
+  formSubmissions     FormSubmission[]
+  performanceMetrics  PerformanceMetric[]
+
+  @@map("websites")
+}
+
+// Analytics Events
+model AnalyticsEvent {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  websiteId   String   @map("website_id") @db.Uuid
+  eventType   String   @map("event_type") @db.VarChar(100) // pageview, click, custom
+  pageUrl     String?  @map("page_url") @db.Text
+  referrer    String?  @db.Text
+  userAgent   String?  @map("user_agent") @db.Text
+  ipAddress   String?  @map("ip_address") @db.Inet
+  country     String?  @db.VarChar(2)
+  city        String?  @db.VarChar(255)
+  deviceType  String?  @map("device_type") @db.VarChar(50)
+  browser     String?  @db.VarChar(100)
+  os          String?  @db.VarChar(100)
+  sessionId   String?  @map("session_id") @db.VarChar(255)
+  userId      String?  @map("user_id") @db.VarChar(255) // anonymous or identified
+  metadata    Json?    @db.JsonB
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@map("analytics_events")
+}
+
+// Form Submissions
+model FormSubmission {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  websiteId String   @map("website_id") @db.Uuid
+  formName  String?  @map("form_name") @db.VarChar(255)
+  fields    Json     @db.JsonB
+  pageUrl   String?  @map("page_url") @db.Text
+  ipAddress String?  @map("ip_address") @db.Inet
+  userAgent String?  @map("user_agent") @db.Text
+  isSpam    Boolean  @default(false) @map("is_spam")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@map("form_submissions")
+}
+
+// Performance Metrics
+model PerformanceMetric {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  websiteId  String   @map("website_id") @db.Uuid
+  pageUrl    String   @map("page_url") @db.Text
+  metricType String   @map("metric_type") @db.VarChar(50) // lcp, fid, cls, ttfb
+  value      Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  website Website @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@map("performance_metrics")
+}
